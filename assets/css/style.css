@@ -1,0 +1,8 @@
+.hidden {
+    opacity: 0;
+    transition: 1s;
+}
+
+main {
+    margin-top: 10px;
+}

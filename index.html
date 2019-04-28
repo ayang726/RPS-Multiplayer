@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- Materialize Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <title>Rock Paper Scissors</title>
+</head>
+
+<body>
+    <!-- Modal Log in dialogue -->
+
+    <div class="modal" id="login-modal">
+        <div class="row modal-content">
+            <form class="col s12">
+                <div class="row">
+                    <h6 class="col s12" id="name-input-line">My name is
+                        <div class="inline input-field">
+                            <input type="text" id="name-input" class="validate">
+                            <label for="name-input">Name</label>
+                        </div>
+                    </h6>
+                </div>
+                <div class="row">
+                    <h6 class="col s12">I would like to use
+                        <div class="inline input-field">
+                            <input type="text" id="username-input" class="validate">
+                            <label for="username-input">Username</label>
+                        </div>
+                        to store my data
+                    </h6>
+                </div>
+                <div class="row">
+                    <h6 class="col s12">I like my data secure: use
+                        <div class="inline input-field">
+                            <input type="password" id="password-input" placeholder="Optional">
+                            <label for="password-input">Password</label>
+                        </div>
+                        to store my data
+                    </h6>
+                </div>
+                <div class="row">
+                    <p class="red-text col s6 hidden" id="login-msg"></p>
+                    <button class="btn red lighten-2 col s2 right" id="btn-signup">Confirm</button>
+                    <button class="btn white blue-grey-text text-lighten-6 col s4 right" id="btn-login">I have a
+                        login!</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Header -->
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#" class="right brand-logo">Rock Paper Scissor</a>
+            <span class="breadcrumb username" id="username">Username</span>
+            <span class="breadcrumb name" id="name">Name</span>
+            <span id="stats-type" class="breadcrumb">Match Count: </span><strong class="match-count"
+                id="match-count"></strong></strong>
+
+        </div>
+    </nav>
+
+    <!-- Main Body -->
+
+    <main>
+        <div class="row">
+            <div class="col s3 center-align">
+                <h5>Online:
+                    <div class="inline red white-text lighten-2"
+                        style="display: inline; padding: 2%; border-radius: 5%;">
+                        <span class="player-count">0</span> Players
+                    </div>
+                </h5>
+                <br>
+                <button class="waves-effect btn white material-icons red-text text-lighten-2" id="refresh-players">
+                    refresh
+                </button>
+                <hr>
+                <div class="">
+                    <button class="btn-large red white-text lighten-2" id="find-match">Find a Match</button>
+                </div>
+            </div>
+            <div class="col s9 _hidden" id="game-room">
+                <div class="row">
+                    <div class="col s6 center-align">
+                        <h4>Player 1</h4>
+                        <h2 class="name">Player 1 Name</h2>
+                        <h5>Match Total: <span class="match-count"></span></h5>
+                        <h5>Wins: <span class="wins"></span></h5>
+                        <h5>Losses: <span class="losses"></span></h5>
+                    </div>
+                    <div class="col s6 center-align">
+                        <h4>Player 2</h4>
+                        <h2 class="opponent-name">Player 2 Name</h2>
+                        <h5>Match Total: <span class="opponent-match-count"></span></h5>
+                        <h5>Wins: <span class="opponent-wins"></span></h5>
+                        <h5>Losses: <span class="opponent-losses"></span></h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+
+
+
+
+    <!-- Scripts -->
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script> -->
+
+    <script src="https://www.gstatic.com/firebasejs/5.10.1/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyBXs9KypEA9xyCw8IS6LphK1-7RaUYuTOw",
+            authDomain: "harcam-rps.firebaseapp.com",
+            databaseURL: "https://harcam-rps.firebaseio.com",
+            projectId: "harcam-rps",
+            storageBucket: "harcam-rps.appspot.com",
+            messagingSenderId: "422690247148"
+        };
+        firebase.initializeApp(config);
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="./assets/javascript/game.js"></script>
+</body>
+
+</html>
