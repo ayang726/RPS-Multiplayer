@@ -1,160 +1,158 @@
+// Materialize Initialization
 var elems = document.querySelectorAll('.modal');
 var instances = M.Modal.init(elems, {});
+
+var elems = document.querySelectorAll('.fixed-action-btn');
+var instances = M.FloatingActionButton.init(elems, {});
+///////////////////////////////////////////////////
 var loginModal = document.getElementById("login-modal");
 const loginModalInstance = M.Modal.getInstance(loginModal)
 const db = firebase.database();
+const playerRefKey = "playerRef";
+var playerRef;
 
-var playerUsername;
+loginModalInstance.open();
 
 // Log in modal form functions
+
 document.querySelector("#btn-login").addEventListener("click", function (e) {
     e.preventDefault();
-    document.getElementById("name-input-line").classList.toggle("hidden");
-});
 
-
-document.querySelector("#btn-signup").addEventListener("click", function (e) {
-    e.preventDefault();
-
-    var name = document.querySelector("#name-input").value;
-    var username = document.querySelector("#username-input").value.toLowerCase();
-    var password = document.querySelector("#password-input").value;
-    if (username !== "") {
-        db.ref("/users/" + username).once("value").then(function (s) {
-            if (s.val()) {
-                if (password === s.val().password) {
-                    // console.log(s.val().password);
-                    login(username);
-                } else {
-                    loginMessage("Wrong Password (Username exists)");
-                }
-            } else if (name !== "") {
-                db.ref("/users/" + username).set({
-                    name: name,
-                    password: password,
-                    loggedIn: false,
-                    inGame: false,
-                    stats: {
-                        losses: 0,
-                        matchCount: 0,
-                        wins: 0
-                    }
-                });
-                login(username)
+    var name = document.querySelector("#name-input").value
+    if (name != "") {
+        playerRef = db.ref("/users/").push({
+            name: name,
+            inGame: false,
+            stats: {
+                losses: 0,
+                matchCount: 0,
+                wins: 0
             }
         });
+        console.log(`${name} logging in with ID: ${playerRef.key}`);
+        login(playerRef);
     }
 });
-function loginMessage(message) {
-    var msg = document.getElementById("login-msg");
-    msg.textContent = message;
-    msg.classList.remove("hidden");
-}
-
-// Update Player Counter (Game Lobby)
-document.querySelector("#refresh-players").addEventListener("click", function () {
-    updatePlayerCount();
-});
-
-function updatePlayerCount() {
-    var playerCount = 0;
-    db.ref("/users").once("value", function (s) {
-        var userList = s.val();
-        // console.log(userList);
-        for (const username in userList) {
-            // console.log(userList[username].loggedIn);
-            if (userList[username].loggedIn) playerCount++;
-        }
-        document.querySelectorAll(".player-count").forEach(e => {
-            e.textContent = playerCount;
-        });
-    });
-}
 
 // Log in / out functions
-function login(username) {
-    console.log(`${username}, logging in`);
-    playerUsername = username;
-    var userOnline;
-    db.ref("/users/" + username).once("value", function (s) {
-        userOnline = s.child("loggedIn").val();
-        // console.log(userOnline);
-        // if user isn't online, then log user in
-        if (userOnline === false) {
-            db.ref("/users/" + username).update({ "loggedIn": true });
-
-            db.ref("/users/" + username).on("value", function (snapshot) {
-                document.querySelector("#username").textContent = username;
-                document.querySelector("#name").textContent = snapshot.val().name;
-                document.querySelectorAll("#match-count").textContent = snapshot.val().stats.matchCount;
-            });
-            loginModalInstance.close();
-            sessionStorage.setItem("username", username);
-
-            updatePlayerCount();
-            db.ref("/users/" + username).onDisconnect().update({ "loggedIn": false, "inGame": false, "gameRoom": "null" });
-        } else {
-            loginMessage("This user is already online");
+function login(playerRef) {
+    playerRef.on("value", function (snapshot) {
+        document.querySelectorAll(".name").forEach(function (e) {
+            e.textContent = snapshot.val().name;
+        });
+        document.querySelectorAll(".match-count").forEach(function (e) {
+            e.textContent = snapshot.val().stats.matchCount;
+        });
+        document.querySelectorAll(".wins").forEach(function (e) {
+            e.textContent = snapshot.val().stats.wins;
+        });
+        document.querySelectorAll(".losses").forEach(function (e) {
+            e.textContent = snapshot.val().stats.losses;
+        });
+        if (snapshot.val().invitationReceived !== undefined) {
+            receivingInvitation(snapshot.val().invitationReceived);
         }
     });
+    loginModalInstance.close();
+    // sessionStorage.setItem(playerRefKey, playerRef.key);
 
-}
-///////// Instead of having a find room button, show a list of all users and their in game status
-///////// the allow clicking on users who aren't in game, and send invite.
-///////// then hook up the two players and start the game
-
-
-
-function updateGameStats(player, opponent) {
-    db.ref("/users/" + player).on("value", function (snapshot) {
-        document.querySelectorAll(".name").forEach(e => {
-            e.textContent = snapshot.val().name;
-        });
-
-        // console.log(snapshot.val().name);
-
-        document.querySelectorAll(".match-count").forEach(e => {
-            e.textContent = snapshot.val().stats.matchCount;
-        });
-        document.querySelectorAll(".wins").forEach(e => {
-            e.textContent = snapshot.val().stats.wins;
-        });
-        document.querySelectorAll(".losses").forEach(e => {
-            e.textContent = snapshot.val().stats.losses;
-        });
+    // Updating player list
+    db.ref("/users").on("child_added", function (child) {
+        populatePlayerList(child);
     });
-    db.ref("/users/" + opponent).on("value", function (snapshot) {
-        document.querySelectorAll(".opponent-name").forEach(e => {
-            e.textContent = snapshot.val().name;
-        });
-
-        // console.log(snapshot.val().name);
-
-        document.querySelectorAll(".opponent-match-count").forEach(e => {
-            e.textContent = snapshot.val().stats.matchCount;
-        });
-        document.querySelectorAll(".opponent-wins").forEach(e => {
-            e.textContent = snapshot.val().stats.wins;
-        });
-        document.querySelectorAll(".opponent-losses").forEach(e => {
-            e.textContent = snapshot.val().stats.losses;
-        });
+    db.ref("/users").on("child_removed", function (child) {
+        // console.log("A child has been removed");
+        removeFromPlayerList(child);
     });
 
+    playerRef.onDisconnect().remove();
 }
 
+function populatePlayerList(player) {
+    var html =
+        `
+            <h5>${player.val().name}
+                <span class="badge lighten-2 match-count" data-badge-caption="waiting"></span>
+            </h5>
+        `
+    var li = document.createElement("li");
+    li.classList.add("player", "collection-item")
+    if (player.key === playerRef.key) {
+        li.classList.add("self");
 
+    } else {
+        li.classList.add("opponent");
+        li.addEventListener("click", function (e) {
+            // create an invite
+            sendInviteTo(player);
+        });
+    }
+    li.setAttribute("playerID", player.key);
+    li.innerHTML = html;
 
-
-
-// Helper functions
-function messagePrompt(msg) {
-    return confirm(msg);
+    document.getElementById("player-list").appendChild(li)
 }
 
-// ----------------- Initialization --------------------
-if (sessionStorage.getItem("username")) {
-    login(sessionStorage.getItem("username"))
-} else {
-    loginModalInstance.open()
-};
+function removeFromPlayerList(player) {
+    var elements = document.querySelectorAll(".player");
+    elements.forEach(e => {
+        if (e.getAttribute("playerID") === player.key) {
+            document.querySelector("#player-list").removeChild(e);
+        }
+    });
+}
+
+function sendInviteTo(player) {
+    console.log("sending invitation");
+    db.ref("/users/" + player.key).once("value", function (s) {
+        if (s.val().inGame === false) {
+            playerRef.once("value", function (s) {
+                var invitationRef = db.ref("/users/" + player.key + "/invitationReceived").push({ userId: playerRef.key, name: s.val().name });
+                db.ref("/users/" + playerRef.key + "/invitationSent/" + invitationRef).set({ userId: player.key, name: player.key });
+            });
+        }
+    });
+}
+
+function receivingInvitation(invitationObj) {
+    for (const key in invitationObj) {
+        if (invitationObj.hasOwnProperty(key)) {
+            const e = invitationObj[key];
+
+            var li = document.createElement("li");
+            li.classList.add("btn-floating", "green");
+            li.textContent = e.name;
+            li.setAttribute("userId", e.userId);
+            li.addEventListener("click", function () {
+                console.log("joining game with " + e.name + ": " + e.userId);
+
+
+                db.ref("/users/" + e.userId).once("value", function (s) {
+                    if (s.val().inGame === false) {
+                        // adding opponent if not in game add to game
+                        db.ref("/users/" + e.userId).on("value", function (snapshot) {
+                            document.querySelectorAll(".opponent-name").forEach(function (e) {
+                                e.textContent = snapshot.val().name;
+                            });
+                            document.querySelectorAll(".opponent-match-count").forEach(function (e) {
+                                e.textContent = snapshot.val().stats.matchCount;
+                            });
+                            document.querySelectorAll(".opponent-wins").forEach(function (e) {
+                                e.textContent = snapshot.val().stats.wins;
+                            });
+                            document.querySelectorAll(".opponent-losses").forEach(function (e) {
+                                e.textContent = snapshot.val().stats.losses;
+                            });
+                        });
+                    }
+                    
+                    // Send invitation back
+                    db.ref("/users/" + e.userId)
+                    // clear all other invitations
+                });
+            });
+        };
+
+        document.getElementById("invitation-list").appendChild(li);
+    }
+}
