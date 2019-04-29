@@ -14,3 +14,7 @@ main {
 .opponent:hover{
     background-color: salmon;
 }
+
+#login-modal {
+    font-size: 2em;
+}

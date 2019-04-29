@@ -1,158 +1,169 @@
 // Materialize Initialization
 var elems = document.querySelectorAll('.modal');
-var instances = M.Modal.init(elems, {});
+var instances = M.Modal.init(elems, { "dismissible": false });
 
-var elems = document.querySelectorAll('.fixed-action-btn');
-var instances = M.FloatingActionButton.init(elems, {});
+// var elems = document.querySelectorAll('.fixed-action-btn');
+// var instances = M.FloatingActionButton.init(elems, {});
 ///////////////////////////////////////////////////
-var loginModal = document.getElementById("login-modal");
-const loginModalInstance = M.Modal.getInstance(loginModal)
-const db = firebase.database();
-const playerRefKey = "playerRef";
-var playerRef;
+const loginModal = document.getElementById("login-modal");
+const loginModalInstance = M.Modal.getInstance(loginModal);
+const lobbyModal = document.getElementById("lobby-modal");
+const lobbyModalInstance = M.Modal.getInstance(lobbyModal);
 
+const db = firebase.database();
 loginModalInstance.open();
 
-// Log in modal form functions
+var roomKey;
 
-document.querySelector("#btn-login").addEventListener("click", function (e) {
+// Creating a room
+document.querySelector("#create-room").addEventListener("click", function (e) {
     e.preventDefault();
-
-    var name = document.querySelector("#name-input").value
-    if (name != "") {
-        playerRef = db.ref("/users/").push({
-            name: name,
+    var name = document.querySelector("#name-input").value.trim();
+    if (name !== "") {
+        var roomRef = db.ref("/gameRooms").push({
+            full: false,
             inGame: false,
-            stats: {
-                losses: 0,
-                matchCount: 0,
-                wins: 0
+            owner: {
+                name: name,
+                ready: false,
+                wins: 0,
+                losses: 0
             }
         });
-        console.log(`${name} logging in with ID: ${playerRef.key}`);
-        login(playerRef);
+        roomKey = roomRef.key;
+        loginModalInstance.close();
+
+        // opening lobby modal
+        lobbyModalInstance.open();
+
+        roomRef.on("value", function (s) {
+            if (s.val().owner) {
+                document.querySelectorAll(".owner-name").forEach(function (e) {
+                    e.textContent = s.val().owner.name;
+                });
+                document.querySelectorAll(".owner-wins").forEach(function (e) {
+                    e.textContent = s.val().owner.wins;
+                });
+                document.querySelectorAll(".owner-losses").forEach(function (e) {
+                    e.textContent = s.val().owner.losses;
+                });
+            }
+
+            if (s.val().guest) {
+                document.querySelectorAll(".guest-name").forEach(function (e) {
+                    e.textContent = s.val().guest.name;
+                });
+                document.querySelectorAll(".guest-wins").forEach(function (e) {
+                    e.textContent = s.val().guest.wins;
+                });
+                document.querySelectorAll(".guest-losses").forEach(function (e) {
+                    e.textContent = s.val().guest.losses;
+                });
+
+                // if guest joined the game, set ready status
+                console.log("a guest joined the room: " + s.val().guest.name);
+                document.querySelector("#ready-btn").classList.add("pulse");
+                document.querySelector("#ready-btn").classList.remove("disabled");
+                document.querySelector("#wait-spinner").classList.remove("active");
+            }
+
+        });
+
+        // disconnection logic:
+        db.ref("/gameRooms/" + roomKey + "/owner").onDisconnect().remove();
     }
 });
 
-// Log in / out functions
-function login(playerRef) {
-    playerRef.on("value", function (snapshot) {
-        document.querySelectorAll(".name").forEach(function (e) {
-            e.textContent = snapshot.val().name;
-        });
-        document.querySelectorAll(".match-count").forEach(function (e) {
-            e.textContent = snapshot.val().stats.matchCount;
-        });
-        document.querySelectorAll(".wins").forEach(function (e) {
-            e.textContent = snapshot.val().stats.wins;
-        });
-        document.querySelectorAll(".losses").forEach(function (e) {
-            e.textContent = snapshot.val().stats.losses;
-        });
-        if (snapshot.val().invitationReceived !== undefined) {
-            receivingInvitation(snapshot.val().invitationReceived);
-        }
-    });
-    loginModalInstance.close();
-    // sessionStorage.setItem(playerRefKey, playerRef.key);
-
-    // Updating player list
-    db.ref("/users").on("child_added", function (child) {
-        populatePlayerList(child);
-    });
-    db.ref("/users").on("child_removed", function (child) {
-        // console.log("A child has been removed");
-        removeFromPlayerList(child);
-    });
-
-    playerRef.onDisconnect().remove();
-}
-
-function populatePlayerList(player) {
-    var html =
-        `
-            <h5>${player.val().name}
-                <span class="badge lighten-2 match-count" data-badge-caption="waiting"></span>
-            </h5>
-        `
-    var li = document.createElement("li");
-    li.classList.add("player", "collection-item")
-    if (player.key === playerRef.key) {
-        li.classList.add("self");
-
-    } else {
-        li.classList.add("opponent");
-        li.addEventListener("click", function (e) {
-            // create an invite
-            sendInviteTo(player);
-        });
-    }
-    li.setAttribute("playerID", player.key);
-    li.innerHTML = html;
-
-    document.getElementById("player-list").appendChild(li)
-}
-
-function removeFromPlayerList(player) {
-    var elements = document.querySelectorAll(".player");
-    elements.forEach(e => {
-        if (e.getAttribute("playerID") === player.key) {
-            document.querySelector("#player-list").removeChild(e);
-        }
-    });
-}
-
-function sendInviteTo(player) {
-    console.log("sending invitation");
-    db.ref("/users/" + player.key).once("value", function (s) {
-        if (s.val().inGame === false) {
-            playerRef.once("value", function (s) {
-                var invitationRef = db.ref("/users/" + player.key + "/invitationReceived").push({ userId: playerRef.key, name: s.val().name });
-                db.ref("/users/" + playerRef.key + "/invitationSent/" + invitationRef).set({ userId: player.key, name: player.key });
+document.querySelector("#join-room").addEventListener("click", function (e) {
+    e.preventDefault();
+    var name = document.querySelector("#name-input").value.trim();
+    if (name !== "") {
+        db.ref("/gameRooms").once("value", function (s) {
+            s.forEach(function (room) {
+                if (room.val().full === false) {
+                    roomKey = room.key;
+                    db.ref("/gameRooms/" + room.key).update({
+                        guest: {
+                            name: name,
+                            ready: false,
+                            wins: 0,
+                            losses: 0
+                        },
+                        full: true
+                    })
+                    return;
+                }
             });
-        }
-    });
-}
-
-function receivingInvitation(invitationObj) {
-    for (const key in invitationObj) {
-        if (invitationObj.hasOwnProperty(key)) {
-            const e = invitationObj[key];
-
-            var li = document.createElement("li");
-            li.classList.add("btn-floating", "green");
-            li.textContent = e.name;
-            li.setAttribute("userId", e.userId);
-            li.addEventListener("click", function () {
-                console.log("joining game with " + e.name + ": " + e.userId);
-
-
-                db.ref("/users/" + e.userId).once("value", function (s) {
-                    if (s.val().inGame === false) {
-                        // adding opponent if not in game add to game
-                        db.ref("/users/" + e.userId).on("value", function (snapshot) {
-                            document.querySelectorAll(".opponent-name").forEach(function (e) {
-                                e.textContent = snapshot.val().name;
-                            });
-                            document.querySelectorAll(".opponent-match-count").forEach(function (e) {
-                                e.textContent = snapshot.val().stats.matchCount;
-                            });
-                            document.querySelectorAll(".opponent-wins").forEach(function (e) {
-                                e.textContent = snapshot.val().stats.wins;
-                            });
-                            document.querySelectorAll(".opponent-losses").forEach(function (e) {
-                                e.textContent = snapshot.val().stats.losses;
-                            });
+            if (roomKey) {
+                db.ref("/gameRooms/" + roomKey).on("value", function (s) {
+                    if (s.val().owner) {
+                        document.querySelectorAll(".owner-name").forEach(function (e) {
+                            e.textContent = s.val().owner.name;
                         });
-                    }
-                    
-                    // Send invitation back
-                    db.ref("/users/" + e.userId)
-                    // clear all other invitations
-                });
-            });
-        };
+                        document.querySelectorAll(".owner-wins").forEach(function (e) {
+                            e.textContent = s.val().owner.wins;
+                        });
+                        document.querySelectorAll(".owner-losses").forEach(function (e) {
+                            e.textContent = s.val().owner.losses;
+                        });
 
-        document.getElementById("invitation-list").appendChild(li);
+                        loginModalInstance.close();
+                        // opening lobby modal
+                        lobbyModalInstance.open();
+                        console.log("Joining the room with owner " + s.val().owner.name);
+                        document.querySelector("#ready-btn").classList.add("pulse");
+                        document.querySelector("#ready-btn").classList.remove("disabled");
+                        document.querySelector("#wait-spinner").classList.remove("active");
+                    }
+
+                    if (s.val().guest) {
+                        document.querySelectorAll(".guest-name").forEach(function (e) {
+                            e.textContent = s.val().guest.name;
+                        });
+                        document.querySelectorAll(".guest-wins").forEach(function (e) {
+                            e.textContent = s.val().guest.wins;
+                        });
+                        document.querySelectorAll(".guest-losses").forEach(function (e) {
+                            e.textContent = s.val().guest.losses;
+                        });
+
+                        // if guest joined the game, set ready status
+
+
+                    }
+
+                });
+            }
+        });
+
     }
-}
+});
+
+document.querySelector("#ready-btn").addEventListener("click", function (e) {
+    e.preventDefault();
+    console.log("Starting game in room: " + roomKey);
+});
+
+
+// Log in modal form functions
+
+/*
+    Join or Create a Game Room
+
+    Creating a game room:
+    must enter a name
+        create a room object in firebase
+            room object contains owner of the room, guest of the room,
+            each user has stats/ number of wins in this room
+
+    Wait for the next player to join the room
+    can leave the room by refreshing the page or by closing it
+    an empty room will be destroyed
+    once another player join the room start the game
+
+    Joining a room
+    start the game right away
+    can leave the room
+    an empty room will be destroyed
+
+*/

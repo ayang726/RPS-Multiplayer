@@ -16,74 +16,22 @@
 <body>
     <!-- Modal Log in dialogue -->
 
-    <div class="modal center-align" id="login-modal">
-        <div class="modal-content">
-            <div class="row">
-                <form class="col s12">
-                    <div class="row">
-                        <div class="col s12" id="name-input-line">My name is
-                            <div class="inline input-field">
-                                <label for="name-input">Name</label>
-                                <input type="text" id="name-input" class="validate">
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class=" row">
-                        <div class="col s12">I would like to...</div>
-                    </div>
-                    <div class="row">
-                        <button class="btn-large waves-effect waves-light red lighten-2 white-text"
-                            id="create-room">Create</button>
-                        <button class="btn-large waves-effect waves-light red lighten-2 white-text"
-                            id="join-room">Join</button>
-                    </div>
-                    <div class=" row">
-                        <div class="col s12">a room</div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal center-align" id="lobby-modal">
-        <div class="modal-content">
-            <div class="container">
+    <div class="modal" id="login-modal">
+        <div class="row modal-content">
+            <form class="col s12">
                 <div class="row">
-                    <div class="col s6">
-                        <h2>Owner</h2>
-                        <h4 class="red lighten-2 owner-name"></h4>
-                    </div>
-                    <div class="col s6">
-                        <h2>Guest</h2>
-                        <h4 class="green lighten-2 guest-name"></h4>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col s12">
-                        <h5 id="lobby-message">Waiting for player to join...</h5>
-                    </div>
-                </div>
-                <div class="row center-align">
-                    <div class="col s12">
-                        <button class="btn-large waves-effect waves-light red lighten-2 white-text disabled"
-                            id="ready-btn">Ready</button>
-                    </div>
-                </div>
-                <div class="preloader-wrapper active" id="wait-spinner">
-                    <div class="spinner-layer spinner-red-only">
-                        <div class="circle-clipper left">
-                            <div class="circle"></div>
+                    <h6 class="col s12" id="name-input-line">My name is
+                        <div class="inline input-field">
+                            <label for="name-input">Name</label>
+                            <input type="text" id="name-input">
+
                         </div>
-                        <div class="gap-patch">
-                            <div class="circle"></div>
-                        </div>
-                        <div class="circle-clipper right">
-                            <div class="circle"></div>
-                        </div>
-                    </div>
+                    </h6>
                 </div>
-            </div>
+                <div class=" row">
+                    <button class="btn red lighten-2 col s2 right" id="btn-login">Confirm</button>
+                </div>
+            </form>
         </div>
     </div>
 
