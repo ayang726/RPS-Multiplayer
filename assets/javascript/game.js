@@ -1,4 +1,4 @@
-document.getElementById("version").textContent = "v0.36";
+document.getElementById("version").textContent = "v0.37";
 
 
 // Materialize Initialization
@@ -291,7 +291,8 @@ function setupGame() {
 
             dbRoomRef([playerIdentity]).update({ choice: chosen });
             dbRoomRef([opponentIdentity, "choice"]).on("value", function (s) {
-                if (s.exists()!== null) {
+                if (s.exists()) {
+                    console.log("getting opponent choice value: " + s.val());
                     dbRoomRef([opponentIdentity, "choice"]).off();
                     // display animation
                     message.textContent = "Ready?"
@@ -349,10 +350,10 @@ function calculateWin() {
             var ownerChoice = s.val().owner.choice;
             var guestChoice = s.val().guest.choice;
             var combination = ownerChoice + guestChoice;
-           
+
             dbRoomRef(["owner"]).update({ "choice": null });
             dbRoomRef(["guest"]).update({ "choice": null });
-            
+
             if (ownerChoice === guestChoice) {
                 // tied
                 dbRoomRef(["owner"]).update({ "ties": s.val().owner.ties + 1 });
