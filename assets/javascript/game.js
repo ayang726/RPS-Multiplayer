@@ -1,4 +1,4 @@
-document.getElementById("version").textContent = "v0.35";
+document.getElementById("version").textContent = "v0.36";
 
 
 // Materialize Initialization
@@ -322,7 +322,6 @@ function setupGame() {
                                         // match result updated
                                         dbRoomRef(["owner", "matchCount"]).off();
                                         updateData();
-                                        dbRoomRef([opponentIdentity]).update({"choice":null});
                                         setTimeout(() => {
                                             resetGame();
                                         }, 2000);
@@ -350,7 +349,10 @@ function calculateWin() {
             var ownerChoice = s.val().owner.choice;
             var guestChoice = s.val().guest.choice;
             var combination = ownerChoice + guestChoice;
-
+           
+            dbRoomRef(["owner"]).update({ "choice": null });
+            dbRoomRef(["guest"]).update({ "choice": null });
+            
             if (ownerChoice === guestChoice) {
                 // tied
                 dbRoomRef(["owner"]).update({ "ties": s.val().owner.ties + 1 });
