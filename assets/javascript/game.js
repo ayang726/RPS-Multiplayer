@@ -1,4 +1,4 @@
-document.getElementById("version").textContent = "v0.33";
+document.getElementById("version").textContent = "v0.35";
 
 
 // Materialize Initialization
@@ -322,14 +322,18 @@ function setupGame() {
                                         // match result updated
                                         dbRoomRef(["owner", "matchCount"]).off();
                                         updateData();
+                                        setTimeout(() => {
+                                            resetGame();
+                                        }, 2000);
+
                                     } else {
                                         console.log("Something is wrong: MSG - 900");
                                     }
                                 });
                                 // set up another round of game
                             }
-                        }, 500);
-                    }, 800);
+                        }, 1000);
+                    }, 600);
 
                 } else {
                     message.textContent = "Waiting for opponent to choose";
@@ -365,6 +369,28 @@ function calculateWin() {
 
         });
     }
+}
+
+
+function resetGame() {
+    console.log("Reseting Game...");
+    var rock = document.querySelector(`#${playerIdentity}-rock`);
+    var paper = document.querySelector(`#${playerIdentity}-paper`);
+    var scissors = document.querySelector(`#${playerIdentity}-scissors`);
+    rock.classList.remove("hidden");
+    paper.classList.remove("hidden");
+    scissors.classList.remove("hidden");
+
+
+    rock.parentNode.replaceChild(rock.cloneNode(true), rock);
+    paper.parentNode.replaceChild(paper.cloneNode(true), paper);
+    scissors.parentNode.replaceChild(scissors.cloneNode(true), scissors);
+
+    var message = document.querySelector("#game-message");
+    message.textContent = "";
+    message.classList.remove("hidden");
+
+    setupGame();
 }
 
 // Helper functions
