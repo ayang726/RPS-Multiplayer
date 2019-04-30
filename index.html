@@ -8,7 +8,8 @@
     <!-- Materialize Stylesheets -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link rel="stylesheet" href="./assets/css/style.css">
     <title>Rock Paper Scissors</title>
 </head>
@@ -16,42 +17,74 @@
 <body>
     <!-- Modal Log in dialogue -->
 
-    <div class="modal" id="login-modal">
-        <div class="row modal-content">
-            <form class="col s12">
-                <div class="row">
-                    <h6 class="col s12" id="name-input-line">My name is
-                        <div class="inline input-field">
-                            <input type="text" id="name-input" class="validate">
-                            <label for="name-input">Name</label>
+    <div class="modal center-align" id="login-modal">
+        <div class="modal-content">
+            <div class="row">
+                <form class="col s12">
+                    <div class="row">
+                        <div class="col s12" id="name-input-line">My name is
+                            <div class="inline input-field">
+                                <label for="name-input">Name</label>
+                                <input type="text" id="name-input" class="validate">
+
+                            </div>
                         </div>
-                    </h6>
+                    </div>
+                    <div class=" row">
+                        <div class="col s12">I would like to...</div>
+                    </div>
+                    <div class="row">
+                        <button class="btn-large waves-effect waves-light red lighten-2 white-text"
+                            id="create-room">Create</button>
+                        <button class="btn-large waves-effect waves-light red lighten-2 white-text"
+                            id="join-room">Join</button>
+                    </div>
+                    <div class=" row">
+                        <div class="col s12">a room</div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal center-align" id="lobby-modal">
+        <div class="modal-content">
+            <div class="container">
+                <div class="row">
+                    <div class="col s6">
+                        <h2>Owner</h2>
+                        <h4 class="red lighten-2 owner-name"></h4>
+                    </div>
+                    <div class="col s6">
+                        <h2>Guest</h2>
+                        <h4 class="green lighten-2 guest-name"></h4>
+                    </div>
                 </div>
                 <div class="row">
-                    <h6 class="col s12">I would like to use
-                        <div class="inline input-field">
-                            <input type="text" id="username-input" class="validate">
-                            <label for="username-input">Username</label>
+                    <div class="col s12">
+                        <h5 id="lobby-message">Waiting for player to join...</h5>
+                    </div>
+                </div>
+                <div class="row center-align">
+                    <div class="col s12">
+                        <button class="btn-large waves-effect waves-light red lighten-2 white-text disabled"
+                            id="ready-btn">Ready</button>
+                    </div>
+                </div>
+                <div class="preloader-wrapper active" id="wait-spinner">
+                    <div class="spinner-layer spinner-red-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
                         </div>
-                        to store my data
-                    </h6>
-                </div>
-                <div class="row">
-                    <h6 class="col s12">I like my data secure: use
-                        <div class="inline input-field">
-                            <input type="password" id="password-input" placeholder="Optional">
-                            <label for="password-input">Password</label>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
                         </div>
-                        to store my data
-                    </h6>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="row">
-                    <p class="red-text col s6 hidden" id="login-msg"></p>
-                    <button class="btn red lighten-2 col s2 right" id="btn-signup">Confirm</button>
-                    <button class="btn white blue-grey-text text-lighten-6 col s4 right" id="btn-login">I have a
-                        login!</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -60,11 +93,9 @@
     <nav>
         <div class="nav-wrapper">
             <a href="#" class="right brand-logo">Rock Paper Scissor</a>
-            <span class="breadcrumb username" id="username">Username</span>
-            <span class="breadcrumb name" id="name">Name</span>
-            <span id="stats-type" class="breadcrumb">Match Count: </span><strong class="match-count"
-                id="match-count"></strong></strong>
-
+            <span class="breadcrumb name">Name</span>
+            <span class="breadcrumb">Match Count: </span><strong class="match-count"></strong></strong>
+            <span class="breadcrumb">Wins: </span><strong class="wins"></strong></strong>
         </div>
     </nav>
 
@@ -72,42 +103,66 @@
 
     <main>
         <div class="row">
-            <div class="col s3 center-align">
-                <h5>Online:
-                    <div class="inline red white-text lighten-2"
-                        style="display: inline; padding: 2%; border-radius: 5%;">
-                        <span class="player-count">0</span> Players
-                    </div>
-                </h5>
-                <br>
-                <button class="waves-effect btn white material-icons red-text text-lighten-2" id="refresh-players">
-                    refresh
-                </button>
-                <hr>
-                <div class="">
-                    <button class="btn-large red white-text lighten-2" id="find-match">Find a Match</button>
-                </div>
-            </div>
-            <div class="col s9 _hidden" id="game-room">
+            <div class="col s12 hidden" id="game-room">
                 <div class="row">
                     <div class="col s6 center-align">
-                        <h4>Player 1</h4>
-                        <h2 class="name">Player 1 Name</h2>
-                        <h5>Match Total: <span class="match-count"></span></h5>
-                        <h5>Wins: <span class="wins"></span></h5>
-                        <h5>Losses: <span class="losses"></span></h5>
+                        <div class="row">
+                            <div class="col s12">
+                                <h4>Owner</h4>
+                                <h2 class="owner-name">Player 1 Name</h2>
+                                <h5>Match Total: <span class="owner-match-count"></span></h5>
+                                <h5>Wins: <span class="owner-wins"></span></h5>
+                                <h5>Losses: <span class="owner-losses"></span></h5>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <h1>
+                                    <i class="fas fa-hand-rock owner-choices" id="owner-rock" value="r"></i> |
+                                    <i class="fas fa-hand-paper owner-choices" id="owner-paper" value="p"></i> |
+                                    <i class="fas fa-hand-scissors owner-choices" id="owner-scissors" value="s"></i>
+                                </h1>
+                            </div>
+                        </div>
                     </div>
                     <div class="col s6 center-align">
-                        <h4>Player 2</h4>
-                        <h2 class="opponent-name">Player 2 Name</h2>
-                        <h5>Match Total: <span class="opponent-match-count"></span></h5>
-                        <h5>Wins: <span class="opponent-wins"></span></h5>
-                        <h5>Losses: <span class="opponent-losses"></span></h5>
+                        <div class="row">
+                            <div class="col s12">
+                                <h4>Guest</h4>
+                                <h2 class="guest-name">Player 2 Name</h2>
+                                <h5>Match Total: <span class="guest-match-count"></span></h5>
+                                <h5>Wins: <span class="guest-wins"></span></h5>
+                                <h5>Losses: <span class="guest-losses"></span></h5>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <h1>
+                                    <i class="fas fa-hand-rock guest-choices" id="guest-rock" value="r"></i> |
+                                    <i class="fas fa-hand-paper guest-choices" id="guest-paper" value="p"></i> |
+                                    <i class="fas fa-hand-scissors guest-choices" id="guest-scissors" value="s"></i>
+                                </h1>
+                            </div>
+                        </div>
                     </div>
+                </div>
+                <div class="row center-align">
+                    <h1 class="col s3" id="owner-chosen"></h1>
+                    <h3 class="col s6" id="game-message"></h3>
+                    <h1 class="col s3" id="guest-chosen"></h1>
                 </div>
             </div>
         </div>
     </main>
+
+    <div class="fixed-action-btn _hidden" id="invitation-button">
+        <a class="btn-floating btn-large red">
+            <i class="large material-icons">email</i>
+        </a>
+        <ul id="invitation-list">
+            <!-- <li class="btn-floating green">Alex</li> -->
+        </ul>
+    </div>
 
 
 

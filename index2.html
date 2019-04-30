@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- Materialize Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <title>Rock Paper Scissors</title>
+</head>
+
+<body>
+    <!-- Modal Log in dialogue -->
+
+    <div class="modal" id="login-modal">
+        <div class="row modal-content">
+            <form class="col s12">
+                <div class="row">
+                    <h6 class="col s12" id="name-input-line">My name is
+                        <div class="inline input-field">
+                            <label for="name-input">Name</label>
+                            <input type="text" id="name-input">
+
+                        </div>
+                    </h6>
+                </div>
+                <div class=" row">
+                    <button class="btn red lighten-2 col s2 right" id="btn-login">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Header -->
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#" class="right brand-logo">Rock Paper Scissor</a>
+            <span class="breadcrumb name">Name</span>
+            <span class="breadcrumb">Match Count: </span><strong class="match-count"></strong></strong>
+            <span class="breadcrumb">Wins: </span><strong class="wins"></strong></strong>
+        </div>
+    </nav>
+
+    <!-- Main Body -->
+
+    <main>
+        <div class="row">
+            <div class="col s3 center-align">
+                <h5>List of Online Players
+                </h5>
+                <hr>
+                <div class="row">
+                    <div class="col s12">
+                        <ul class="collection" id="player-list">
+                            <!-- <li class="player collection-item" player="Alex">
+                                <h5>Alex<span class="new badge red lighten-2 match-count"
+                                        data-badge-caption="in game"></span>
+                                </h5>
+                            </li>
+                            <li class="player collection-item" player="Alex">
+                                <h5>Jason<span class="badge lighten-2 match-count" data-badge-caption="waiting"></span>
+                                </h5>
+                            </li> -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col s9 _hidden" id="game-room">
+                <div class="row">
+                    <div class="col s6 center-align">
+                        <h4>Player 1</h4>
+                        <h2 class="name">Player 1 Name</h2>
+                        <h5>Match Total: <span class="match-count"></span></h5>
+                        <h5>Wins: <span class="wins"></span></h5>
+                        <h5>Losses: <span class="losses"></span></h5>
+                    </div>
+                    <div class="col s6 center-align">
+                        <h4>Player 2</h4>
+                        <h2 class="opponent-name">Player 2 Name</h2>
+                        <h5>Match Total: <span class="opponent-match-count"></span></h5>
+                        <h5>Wins: <span class="opponent-wins"></span></h5>
+                        <h5>Losses: <span class="opponent-losses"></span></h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="fixed-action-btn _hidden" id="invitation-button">
+        <a class="btn-floating btn-large red">
+            <i class="large material-icons">email</i>
+        </a>
+        <ul id="invitation-list">
+            <!-- <li class="btn-floating green">Alex</li> -->
+        </ul>
+    </div>
+
+
+
+
+
+
+    <!-- Scripts -->
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script> -->
+
+    <script src="https://www.gstatic.com/firebasejs/5.10.1/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyBXs9KypEA9xyCw8IS6LphK1-7RaUYuTOw",
+            authDomain: "harcam-rps.firebaseapp.com",
+            databaseURL: "https://harcam-rps.firebaseio.com",
+            projectId: "harcam-rps",
+            storageBucket: "harcam-rps.appspot.com",
+            messagingSenderId: "422690247148"
+        };
+        firebase.initializeApp(config);
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="./assets/javascript/game.js"></script>
+</body>
+
+</html>

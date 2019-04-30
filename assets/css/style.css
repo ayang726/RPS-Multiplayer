@@ -6,3 +6,15 @@
 main {
     margin-top: 10px;
 }
+
+.self {
+    background: lightslategray !important;
+}
+
+.opponent:hover{
+    background-color: salmon;
+}
+
+#login-modal {
+    font-size: 2em;
+}
