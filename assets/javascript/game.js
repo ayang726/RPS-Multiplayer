@@ -37,6 +37,7 @@ document.querySelector("#create-room").addEventListener("click", function (e) {
                 wins: 0,
                 losses: 0,
                 ties: 0,
+                matchCount: 0,
                 choice: null
             }
         });
@@ -87,6 +88,7 @@ document.querySelector("#join-room").addEventListener("click", function (e) {
                             wins: 0,
                             losses: 0,
                             ties: 0,
+                            matchCount: 0,
                             choice: null
                         },
                         full: true
@@ -162,6 +164,7 @@ document.querySelector("#ready-btn").addEventListener("click", function (e) {
 function setupListeners() {
     db.ref("/gameRooms/" + roomKey + "/connected").on("value", function (s) {
         if (s.val() !== true) {
+            db.ref("/gameRooms/" + roomKey + "/connected").off();
             console.log("Opponent has left the room");
             alert("Opponent has left the room");
             location.reload();
@@ -170,7 +173,9 @@ function setupListeners() {
 }
 
 function updateData() {
+
     db.ref("/gameRooms/" + roomKey + "/owner").once("value", function (s) {
+        ownerObject = s.val();
         document.querySelectorAll(".owner-name").forEach(function (e) {
             e.textContent = s.val().name;
         });
@@ -181,7 +186,7 @@ function updateData() {
             e.textContent = s.val().losses;
         });
         document.querySelectorAll(".owner-match-count").forEach(function (e) {
-            e.textContent = s.val().wins + s.val().losses + s.val().ties;
+            e.textContent = s.val().matchCount;
         });
 
         if (playerIdentity === "owner") {
@@ -190,6 +195,7 @@ function updateData() {
     });
 
     db.ref("/gameRooms/" + roomKey + "/guest").once("value", function (s) {
+        guestObject = s.val();
         document.querySelectorAll(".guest-name").forEach(function (e) {
             e.textContent = s.val().name;
         });
@@ -304,11 +310,23 @@ function setupGame() {
                                 }
                                 choice.classList.remove("hidden");
                                 calculateWin();
-                                updateData();
+                                // listening to matchCount increases
+                                dbRoomRef(["owner", "matchCount"]).on("value", function (s) {
+                                    console.log("executed msg-102");
+                                    console.log("matchCount on server: " + s.val());
+                                    console.log("local match count = " + ownerObject.matchCount);
+                                    if (s.val() === ownerObject.matchCount + 1) {
+                                        // match result updated
+                                        dbRoomRef(["owner", "matchCount"]).off();
+                                        updateData();
+                                    } else {
+                                        console.log("Something is wrong: MSG - 900");
+                                    }
+                                });
                                 // set up another round of game
                             }
-                        }, 1000);
-                    }, 1000);
+                        }, 500);
+                    }, 800);
 
                 } else {
                     message.textContent = "Waiting for opponent to choose";
@@ -324,6 +342,7 @@ function calculateWin() {
             var ownerChoice = s.val().owner.choice;
             var guestChoice = s.val().guest.choice;
             var combination = ownerChoice + guestChoice;
+
             if (ownerChoice === guestChoice) {
                 // tied
                 dbRoomRef(["owner"]).update({ "ties": s.val().owner.ties + 1 });
@@ -337,6 +356,10 @@ function calculateWin() {
                 dbRoomRef(["owner"]).update({ "losses": s.val().owner.losses + 1 });
                 dbRoomRef(["guest"]).update({ "wins": s.val().guest.wins + 1 });
             }
+
+            dbRoomRef(["owner"]).update({ "matchCount": s.val().owner.matchCount + 1 });
+            dbRoomRef(["guest"]).update({ "matchCount": s.val().guest.matchCount + 1 });
+
         });
     }
 }
@@ -348,7 +371,6 @@ function dbRoomRef(pathArray) {
     pathArray.forEach(e => {
         relativePath += "/" + e;
     });
-    console.log("/gameRooms/" + roomKey + relativePath);
     return db.ref("/gameRooms/" + roomKey + relativePath);
 }
 
