@@ -326,8 +326,8 @@ function calculateWin() {
             var combination = ownerChoice + guestChoice;
             if (ownerChoice === guestChoice) {
                 // tied
-                dbRoomRef(["owner", "ties"]).update(s.val().owner.ties + 1);
-                dbRoomRef(["guest", "ties"]).update(s.val().guest.ties + 1);
+                dbRoomRef(["owner"]).update({ "ties": s.val().owner.ties + 1 });
+                dbRoomRef(["guest"]).update({ "ties": s.val().guest.ties + 1 });
             } else if (combination === "pr" || combination === "sp" || combination === "rs") {
                 // owner wins
                 dbRoomRef(["owner"]).update({ "wins": s.val().owner.wins + 1 });
