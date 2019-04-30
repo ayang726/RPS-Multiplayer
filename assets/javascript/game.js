@@ -1,3 +1,6 @@
+document.getElementById("version").textContent = "v0.33";
+
+
 // Materialize Initialization
 var elems = document.querySelectorAll('.modal');
 var instances = M.Modal.init(elems, { "dismissible": false });
