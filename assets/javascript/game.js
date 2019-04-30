@@ -291,7 +291,7 @@ function setupGame() {
 
             dbRoomRef([playerIdentity]).update({ choice: chosen });
             dbRoomRef([opponentIdentity, "choice"]).on("value", function (s) {
-                if (s.exists()) {
+                if (s.exists()!== null) {
                     dbRoomRef([opponentIdentity, "choice"]).off();
                     // display animation
                     message.textContent = "Ready?"
@@ -322,6 +322,7 @@ function setupGame() {
                                         // match result updated
                                         dbRoomRef(["owner", "matchCount"]).off();
                                         updateData();
+                                        dbRoomRef([opponentIdentity]).update({"choice":null});
                                         setTimeout(() => {
                                             resetGame();
                                         }, 2000);
