@@ -96,7 +96,8 @@ document.querySelector("#join-room").addEventListener("click", function (e) {
                         },
                         full: true
                     })
-                    return;
+                    console.log("Called - message 103");
+                    return true;
                 }
             });
             if (roomKey) {
