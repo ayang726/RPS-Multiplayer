@@ -55,11 +55,12 @@ function createChat() {
     // console.log("called: msg - 104");
 
     var inputValue = chatForm.getElementsByTagName("input")[0].value;
+    if (inputValue !== "") {
+        chatForm.getElementsByTagName("input")[0].value = "";
 
-    chatForm.getElementsByTagName("input")[0].value = "";
-
-    //pushing chat to db
-    db.ref("/gameRooms/" + roomKey + "/chats").push({ "message": inputValue, "identity": playerIdentity });
+        //pushing chat to db
+        db.ref("/gameRooms/" + roomKey + "/chats").push({ "message": inputValue, "identity": playerIdentity });
+    }
 }
 
 

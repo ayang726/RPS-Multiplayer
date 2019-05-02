@@ -10,7 +10,9 @@
 
 #chat-messages{
     position: fixed;
-    bottom: 100px;
+    bottom: 50px;;
+    height: 120px;
+    overflow:auto;
     
 }
 
