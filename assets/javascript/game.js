@@ -1,4 +1,4 @@
-document.getElementById("version").textContent = "v0.37";
+document.getElementById("version").textContent = "v1.0";
 
 
 // Materialize Initialization
