@@ -7,6 +7,7 @@ var instances = M.Modal.init(elems, { "dismissible": false });
 
 // var elems = document.querySelectorAll('.fixed-action-btn');
 // var instances = M.FloatingActionButton.init(elems, {});
+
 ///////////////////////////////////////////////////
 const loginModal = document.getElementById("login-modal");
 const loginModalInstance = M.Modal.getInstance(loginModal);
@@ -23,6 +24,8 @@ var ownerObject = {};
 var guestObject = {}
 var connected = false;
 // var roomFull = false;
+
+document.querySelector("#name-input").focus();
 
 // Creating a room
 document.querySelector("#create-room").addEventListener("click", function (e) {
@@ -161,6 +164,7 @@ document.querySelector("#ready-btn").addEventListener("click", function (e) {
             // Start the game
             lobbyModalInstance.close();
             setupGame();
+            listenToChats();
         }
     });
 });

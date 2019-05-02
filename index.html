@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
         integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link rel="stylesheet" href="./assets/css/style.css">
+    <link rel="stylesheet" href="./assets/css/chat.css">
     <title>Rock Paper Scissors</title>
 </head>
 
@@ -105,7 +106,7 @@
         <div class="row">
             <div class="col s12 hidden" id="game-room">
                 <div class="row">
-                    <div class="col s6 center-align">
+                    <div class="col s4 center-align">
                         <div class="row">
                             <div class="col s12">
                                 <h4>Owner</h4>
@@ -125,7 +126,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col s6 center-align">
+                    <div class="col s4 center-align">
+                        <h3 id="game-message"></h3>
+                    </div>
+                    <div class="col s4 center-align">
                         <div class="row">
                             <div class="col s12">
                                 <h4>Guest</h4>
@@ -146,26 +150,31 @@
                         </div>
                     </div>
                 </div>
-                <div class="row center-align">
+                <!-- <div class="row center-align">
                     <h1 class="col s3" id="owner-chosen"></h1>
-                    <h3 class="col s6" id="game-message"></h3>
+
                     <h1 class="col s3" id="guest-chosen"></h1>
-                </div>
+                </div> -->
             </div>
         </div>
     </main>
 
-    <div class="fixed-action-btn _hidden" id="invitation-button">
-        <a class="btn-floating btn-large red">
+
+
+    <!-- Chat section -->
+    <section class="container" id="chat-messages">
+
+    </section>
+
+
+    <div class="fixed-action-btn _hidden" id="chat">
+        <a class="btn-floating btn-large red" id="chat-btn">
             <i class="large material-icons">email</i>
         </a>
-        <ul id="invitation-list">
-            <!-- <li class="btn-floating green">Alex</li> -->
-        </ul>
+        <form id="chat-form">
+            <input type="text" placeholder="Say something nice.">
+        </form>
     </div>
-
-
-
 
 
 
@@ -188,6 +197,7 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="./assets/javascript/game.js"></script>
+    <script src="./assets/javascript/chat.js"></script>
 </body>
 
 </html>

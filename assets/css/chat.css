@@ -1,0 +1,31 @@
+#chat > form {
+    display: block;
+    position: relative;
+    width: 300px;
+    float: left;
+    right: 30px;
+    bottom: 20;
+    opacity: 0;
+}
+
+#chat-messages{
+    position: fixed;
+    bottom: 100px;
+    
+}
+
+#chat-messages .card-panel {
+    vertical-align: top;
+    max-width: 100px;
+    padding: 5px;
+    margin:1px;
+    border-radius: 10%;
+    display: inline-block;
+}
+
+#chat-messages .card-panel span {
+    max-height: 100px;
+    overflow-wrap: break-word;
+    overflow-y: scroll;
+    display: block;
+}

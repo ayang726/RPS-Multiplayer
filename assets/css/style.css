@@ -18,3 +18,7 @@ main {
 #login-modal {
     font-size: 2em;
 }
+
+#game-message {
+    margin-top: 25vh;
+}
